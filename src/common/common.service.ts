@@ -7,7 +7,7 @@ import {
   Repository,
 } from 'typeorm';
 import { BaseModel } from './entities/base.entitiy';
-import { MAPPER } from './const/mapper';
+import { MAPPER } from './const/filter-mappe.constr';
 
 import { ENV_HOST_KEY, ENV_PROTOCOL_KEY } from './const/env-keys.const';
 import { ConfigService } from '@nestjs/config';

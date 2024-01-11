@@ -9,6 +9,8 @@ import {
   ParseIntPipe,
   UseGuards,
   Query,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { PostsModel } from './posts.entity';
@@ -17,6 +19,7 @@ import { User } from 'src/users/decorator/user.decorator';
 import { CreatePostDto } from './dto/create-post.dto';
 import { updatePostDto } from './dto/update-post.dto';
 import { paginateDto } from './dto/paginate-post.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('posts')
 export class PostsController {
@@ -33,8 +36,13 @@ export class PostsController {
 
   @Post()
   @UseGuards(AccessTokenGuard)
-  async postPost(@User('id') id: number, @Body() body: CreatePostDto) {
-    return this.postsService.createPost(body, id);
+  @UseInterceptors(FileInterceptor('image'))
+  async postPost(
+    @User('id') id: number,
+    @Body() body: CreatePostDto,
+    @UploadedFile() file?: Express.Multer.File,
+  ) {
+    return this.postsService.createPost(body, id, file?.filename);
   }
 
   @Patch(':id')
@@ -50,9 +58,9 @@ export class PostsController {
     return this.postsService.deletePost(id);
   }
 
-  @Post('random')
-  @UseGuards(AccessTokenGuard)
-  async postPostRandom(@User('id') id: number) {
-    return await this.postsService.createRandomPost(id);
-  }
+  // @Post('random')
+  // @UseGuards(AccessTokenGuard)
+  // async postPostRandom(@User('id') id: number) {
+  //   return await this.postsService.createRandomPost(id);
+  // }
 }

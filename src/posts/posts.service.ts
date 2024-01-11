@@ -1,13 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import {
-  FindOneOptions,
-  FindOptionsWhere,
-  LessThan,
-  Like,
-  MoreThan,
-  Repository,
-} from 'typeorm';
+import { Repository } from 'typeorm';
 import { PostsModel } from './posts.entity';
 import { CreatePostDto } from './dto/create-post.dto';
 import { updatePostDto } from './dto/update-post.dto';
@@ -35,12 +28,13 @@ export class PostsService {
     return post;
   }
 
-  async createPost(postDto: CreatePostDto, authorId: number) {
+  async createPost(postDto: CreatePostDto, authorId: number, image?: string) {
     const post = this.postsRepository.create({
       author: {
         id: authorId,
       },
       ...postDto,
+      image,
       likeCount: 0,
       commentCount: 0,
     });
@@ -158,18 +152,18 @@ export class PostsService {
   //     next: nextRequestUrl?.toString() ?? null,
   //   };
   // }
-  async createRandomPost(authorId: number) {
-    for (let i = 0; i < 100; i++) {
-      await this.createPost(
-        {
-          title: `임의로 생성된 포스트 제목 ${i}`,
-          content: `임의로 생성된 포스트 내용 ${i}`,
-        },
-        authorId,
-      );
-    }
-    return true;
-  }
+  // async createRandomPost(authorId: number) {
+  //   for (let i = 0; i < 100; i++) {
+  //     await this.createPost(
+  //       {
+  //         title: `임의로 생성된 포스트 제목 ${i}`,
+  //         content: `임의로 생성된 포스트 내용 ${i}`,
+  //       },
+  //       authorId,
+  //     );
+  //   }
+  //   return true;
+  // }
   async getPosts(dto: paginateDto) {
     return this.commonService.paginate<PostsModel>(
       dto,

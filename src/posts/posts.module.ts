@@ -13,7 +13,7 @@ import { CommonModule } from 'src/common/common.module';
     UsersModule,
     AuthModule,
     CommonModule,
-  ], //레퍼지토리 만드는 코드? IOC컨테이너 위에 올린다
+  ],
   controllers: [PostsController],
   providers: [PostsService],
 })

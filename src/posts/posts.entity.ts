@@ -26,6 +26,10 @@ export class PostsModel extends BaseModel {
   @Column()
   commentCount: number;
 
+  @Column({
+    nullable: true,
+  })
+  image?: string;
   @ManyToOne(() => UsersModel, (author) => author.posts, {
     nullable: false,
   })

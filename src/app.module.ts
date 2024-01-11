@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { BadRequestException, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PostsModule } from './posts/posts.module';
@@ -16,11 +16,17 @@ import {
   ENV_DB_PORT_KEY,
   ENV_DB_USERNAME_KEY,
 } from './common/const/env-keys.const';
-
+import { MulterModule } from '@nestjs/platform-express';
+import { extname } from 'path';
+import * as multer from 'multer';
+import { POST_IMAGE_PATH } from './common/const/path.const';
+import { v4 as uuid } from 'uuid';
 @Module({
   imports: [
     UsersModule,
     PostsModule,
+    AuthModule,
+    CommonModule,
     ConfigModule.forRoot({
       envFilePath: ['.env'],
       isGlobal: true,
@@ -35,8 +41,29 @@ import {
       entities: [PostsModel, UsersModel],
       synchronize: true,
     }),
-    AuthModule,
-    CommonModule,
+    MulterModule.register({
+      limits: {
+        fileSize: 100000000000,
+      },
+      fileFilter: (res, file, cb) => {
+        const exp = extname(file.originalname);
+        if (exp !== 'jpg' && exp !== 'png' && 'jpeg') {
+          return cb(
+            new BadRequestException('jpg, png, jpeg파일로만 업로드 가능합니다'),
+            false,
+          );
+        }
+        return cb(null, true);
+      },
+      storage: multer.diskStorage({
+        destination: function (req, file, cb) {
+          cb(null, POST_IMAGE_PATH);
+        },
+        filename: function (req, file, cb) {
+          cb(null, `${uuid()}${extname(file.originalname)}`);
+        },
+      }),
+    }),
   ],
   controllers: [AppController],
   providers: [AppService],
