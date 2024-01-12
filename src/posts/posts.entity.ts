@@ -24,7 +24,6 @@ export class PostsModel extends BaseModel {
     nullable: true,
   })
   @Transform(({ value }) => {
-    console.log(value);
     return value && `/${join('public/posts', value)}`;
   })
   image?: string;

@@ -35,16 +35,16 @@ export class PostsController {
   async getPost(@Param('id', ParseIntPipe) id: number): Promise<PostsModel> {
     return this.postsService.getPostById(id);
   }
+  /**
+   * common에서 받은 포스터 이름을 받아온다
+   * 업로드 버튼이 눌린 순간 받아온 파일 이름을 엔티티 image에 추가하고 포스터를 생성한다
+   */
 
   @Post()
   @UseGuards(AccessTokenGuard)
-  @UseInterceptors(FileInterceptor('image'))
-  async postPost(
-    @User('id') id: number,
-    @Body() body: CreatePostDto,
-    @UploadedFile() file?: Express.Multer.File,
-  ) {
-    return this.postsService.createPost(body, id, file?.filename);
+  async postPost(@User('id') id: number, @Body() body: CreatePostDto) {
+    await this.postsService.moveFile(body);
+    return this.postsService.createPost(body, id);
   }
 
   @Patch(':id')

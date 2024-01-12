@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { PostsModel } from './posts.entity';
@@ -6,6 +10,12 @@ import { CreatePostDto } from './dto/create-post.dto';
 import { updatePostDto } from './dto/update-post.dto';
 import { paginateDto } from './dto/paginate-post.dto';
 import { CommonService } from 'src/common/common.service';
+import { promises } from 'fs';
+import {
+  POST_ROUTER_IMAGE_PATH,
+  TEMP_FODER_PATH,
+} from 'src/common/const/path.const';
+import { basename, join } from 'path';
 
 @Injectable()
 export class PostsService {
@@ -28,13 +38,25 @@ export class PostsService {
     return post;
   }
 
-  async createPost(postDto: CreatePostDto, authorId: number, image?: string) {
+  async moveFile(dto: CreatePostDto) {
+    const tempPath = join(TEMP_FODER_PATH, dto.image);
+    try {
+      await promises.access(tempPath);
+    } catch (e) {
+      throw new BadRequestException('temp에 파일이 없습니다');
+    }
+    const fileName = basename(tempPath);
+    const newPath = join(POST_ROUTER_IMAGE_PATH, fileName);
+    await promises.rename(tempPath, newPath);
+    return true;
+  }
+
+  async createPost(postDto: CreatePostDto, authorId: number) {
     const post = this.postsRepository.create({
       author: {
         id: authorId,
       },
       ...postDto,
-      image,
       likeCount: 0,
       commentCount: 0,
     });
