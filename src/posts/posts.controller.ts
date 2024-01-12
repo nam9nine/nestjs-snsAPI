@@ -11,6 +11,7 @@ import {
   Query,
   UseInterceptors,
   UploadedFile,
+  ClassSerializerInterceptor,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { PostsModel } from './posts.entity';
@@ -25,6 +26,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
   @Get()
+  @UseInterceptors(ClassSerializerInterceptor)
   async getAllPosts(@Query() query: paginateDto) {
     return this.postsService.getPosts(query);
   }

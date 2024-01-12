@@ -1,16 +1,10 @@
+import { Transform } from 'class-transformer';
 import { IsString } from 'class-validator';
+import { join } from 'path';
+import { POST_ROUTER_IMAGE_PATH } from 'src/common/const/path.const';
 import { BaseModel } from 'src/common/entities/base.entitiy';
 import { UsersModel } from 'src/users/entities/users.entity';
-import {
-  BaseEntity,
-  Column,
-  CreateDateColumn,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 
 @Entity()
 export class PostsModel extends BaseModel {
@@ -29,7 +23,12 @@ export class PostsModel extends BaseModel {
   @Column({
     nullable: true,
   })
+  @Transform(({ value }) => {
+    console.log(value);
+    return value && `/${join('public/posts', value)}`;
+  })
   image?: string;
+
   @ManyToOne(() => UsersModel, (author) => author.posts, {
     nullable: false,
   })
