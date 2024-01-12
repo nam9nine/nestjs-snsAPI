@@ -9,6 +9,7 @@ export const PROJECT_ROOT_PTAH = process.cwd();
 export const PUBLIC_FOLDER_NAME = 'public';
 export const POSTS_FOLDER_NAME = 'posts';
 
+//root/public
 export const PUBLIC_FOLDER_PATH = join(PROJECT_ROOT_PTAH, PUBLIC_FOLDER_NAME);
 
 //파일 저장 root/public/posts

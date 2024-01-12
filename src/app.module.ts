@@ -16,11 +16,9 @@ import {
   ENV_DB_PORT_KEY,
   ENV_DB_USERNAME_KEY,
 } from './common/const/env-keys.const';
-import { MulterModule } from '@nestjs/platform-express';
-import { extname } from 'path';
-import * as multer from 'multer';
-import { POST_IMAGE_PATH } from './common/const/path.const';
-import { v4 as uuid } from 'uuid';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { PUBLIC_FOLDER_NAME } from './common/const/path.const';
+
 @Module({
   imports: [
     UsersModule,
@@ -41,28 +39,9 @@ import { v4 as uuid } from 'uuid';
       entities: [PostsModel, UsersModel],
       synchronize: true,
     }),
-    MulterModule.register({
-      limits: {
-        fileSize: 100000000000,
-      },
-      fileFilter: (res, file, cb) => {
-        const exp = extname(file.originalname);
-        if (exp !== 'jpg' && exp !== 'png' && 'jpeg') {
-          return cb(
-            new BadRequestException('jpg, png, jpeg파일로만 업로드 가능합니다'),
-            false,
-          );
-        }
-        return cb(null, true);
-      },
-      storage: multer.diskStorage({
-        destination: function (req, file, cb) {
-          cb(null, POST_IMAGE_PATH);
-        },
-        filename: function (req, file, cb) {
-          cb(null, `${uuid()}${extname(file.originalname)}`);
-        },
-      }),
+    ServeStaticModule.forRoot({
+      rootPath: PUBLIC_FOLDER_NAME,
+      serveRoot: '/public',
     }),
   ],
   controllers: [AppController],

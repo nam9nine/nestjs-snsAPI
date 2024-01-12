@@ -21,7 +21,7 @@ export class AuthService {
   //accessToken, refreshToken 발급
   signToken(user: Pick<UsersModel, 'email' | 'id'>, isRefreshToken: boolean) {
     const payload = {
-      sub: user.id,
+      id: user.id,
       email: user.email,
       type: isRefreshToken ? 'refresh' : 'access',
     };
@@ -44,11 +44,8 @@ export class AuthService {
         secret: this.ConfigService.get<string>(ENV_JWT_SECRET_KEY),
       });
       return payload;
-    } catch (error) {
-      if (error.name === 'TokenExpiredError') {
-        throw new UnauthorizedException('토큰이 만료되었습니다');
-      }
-      return error;
+    } catch (e) {
+      throw new UnauthorizedException('토큰이 만료되었습니다');
     }
   }
   //login 할 때 필요한 함수
@@ -117,13 +114,12 @@ export class AuthService {
     if (decode.type !== 'refresh') {
       throw new UnauthorizedException('토큰 재발급은 refresh토큰만 가능합니다');
     }
-    const accessToken = this.signToken(
+
+    return this.signToken(
       {
         ...decode,
       },
       isRefreshToken,
     );
-
-    return accessToken;
   }
 }
