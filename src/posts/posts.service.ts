@@ -2,20 +2,16 @@ import {
   BadRequestException,
   Injectable,
   NotFoundException,
+  Post,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { QueryRunner, Repository } from 'typeorm';
 import { PostsModel } from './posts.entity';
 import { CreatePostDto } from './dto/create-post.dto';
 import { updatePostDto } from './dto/update-post.dto';
 import { paginateDto } from './dto/paginate-post.dto';
 import { CommonService } from 'src/common/common.service';
-import { promises } from 'fs';
-import {
-  POST_ROUTER_IMAGE_PATH,
-  TEMP_FODER_PATH,
-} from 'src/common/const/path.const';
-import { basename, join } from 'path';
+import { ImageModel } from 'src/common/entities/image.entity';
 
 @Injectable()
 export class PostsService {
@@ -30,37 +26,30 @@ export class PostsService {
       where: {
         id,
       },
-      relations: ['author'],
-    }); //await 키워드 안 쓰면 promise객체가 즉시 반환되어 오류 감지 못 함
+      relations: ['author', 'images'],
+    });
     if (!post) {
       throw new NotFoundException();
     }
     return post;
   }
-
-  async moveFile(dto: CreatePostDto) {
-    const tempPath = join(TEMP_FODER_PATH, dto.image);
-    try {
-      await promises.access(tempPath);
-    } catch (e) {
-      throw new BadRequestException('temp에 파일이 없습니다');
-    }
-    const fileName = basename(tempPath);
-    const newPath = join(POST_ROUTER_IMAGE_PATH, fileName);
-    await promises.rename(tempPath, newPath);
-    return true;
+  getRepository(qr?: QueryRunner) {
+    return qr
+      ? qr.manager.getRepository<PostsModel>(PostsModel)
+      : this.postsRepository;
   }
-
-  async createPost(postDto: CreatePostDto, authorId: number) {
-    const post = this.postsRepository.create({
+  async createPost(postDto: CreatePostDto, authorId: number, qr?: QueryRunner) {
+    const repository = this.getRepository(qr);
+    const post = repository.create({
       author: {
         id: authorId,
       },
       ...postDto,
       likeCount: 0,
       commentCount: 0,
+      images: [],
     });
-    const newPost = await this.postsRepository.save(post);
+    const newPost = await repository.save(post);
 
     return newPost;
   }
@@ -103,7 +92,7 @@ export class PostsService {
       dto,
       this.postsRepository,
       'posts',
-      {},
+      { relations: ['images', 'author'] },
     );
   }
 }
