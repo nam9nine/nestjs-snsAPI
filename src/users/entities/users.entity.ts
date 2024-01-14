@@ -2,8 +2,9 @@ import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { RolesEnum } from '../const/enum.const';
 import { PostsModel } from 'src/posts/posts.entity';
 import { BaseModel } from 'src/common/entities/base.entitiy';
-import { IsEmail, Length, ValidationArguments } from 'class-validator';
+import { IsEmail, Length } from 'class-validator';
 import { lengthValidationFunc } from 'src/common/validation-message/length-validation.message';
+import { Exclude } from 'class-transformer';
 
 @Entity()
 export class UsersModel extends BaseModel {
@@ -25,6 +26,9 @@ export class UsersModel extends BaseModel {
   @Column()
   @Length(3, 8, {
     message: lengthValidationFunc,
+  })
+  @Exclude({
+    toPlainOnly: true,
   })
   password: string;
 
