@@ -1,7 +1,4 @@
-import { Transform } from 'class-transformer';
 import { IsString } from 'class-validator';
-import { join } from 'path';
-import { POST_ROUTER_IMAGE_PATH } from 'src/common/const/path.const';
 import { BaseModel } from 'src/common/entities/base.entitiy';
 import { ImageModel } from 'src/common/entities/image.entity';
 import { UsersModel } from 'src/users/entities/users.entity';
@@ -28,5 +25,5 @@ export class PostsModel extends BaseModel {
   author: UsersModel;
 
   @OneToMany(() => ImageModel, (images) => images.post)
-  images: ImageModel[];
+  images?: ImageModel[];
 }

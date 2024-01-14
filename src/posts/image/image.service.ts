@@ -1,8 +1,8 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ImageModel, UsedType } from 'src/common/entities/image.entity';
-import { QueryResult, QueryRunner, Repository } from 'typeorm';
-import { PostsModel } from '../posts.entity';
+import { ImageModel } from 'src/common/entities/image.entity';
+import { QueryRunner, Repository } from 'typeorm';
+
 import {
   POST_ROUTER_IMAGE_PATH,
   TEMP_FODER_PATH,
@@ -39,10 +39,10 @@ export class ImageService {
     const image = repository.create({
       ...dto,
     });
-    const newImage = await repository.save(image);
+    await repository.save(image);
 
     await promises.rename(tempPath, newPath);
 
-    return newImage;
+    return true;
   }
 }

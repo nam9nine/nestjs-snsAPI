@@ -6,6 +6,4 @@ export const lengthValidationFunc = (args: ValidationArguments) => {
   } else {
     return `${args.property}를 ${args.constraints[0]}이상으로 입력해주세요`;
   }
-
-  return;
 };

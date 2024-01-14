@@ -1,14 +1,11 @@
-import { IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsNumber, IsString } from 'class-validator';
+import { join } from 'path';
 import { PostsModel } from 'src/posts/posts.entity';
-import {
-  Column,
-  Entity,
-  ManyToMany,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { POST_ROUTER_IMAGE_PATH } from '../const/path.const';
+import { Transform } from 'class-transformer';
 
-export enum UsedType {
+export enum ImageUsedType {
   POST = 'POST',
   USER = 'USER',
 }
@@ -25,14 +22,20 @@ export class ImageModel {
 
   @Column()
   @IsString()
-  @IsOptional()
-  path?: string;
+  @Transform(({ value, obj }) => {
+    if (obj.type === ImageUsedType.POST) {
+      return `/${join(POST_ROUTER_IMAGE_PATH, value)}`;
+    } else {
+      return value;
+    }
+  })
+  path: string;
 
   @ManyToOne((type) => PostsModel, (post) => post.images)
   post: PostsModel;
 
   @Column({
-    enum: UsedType,
+    enum: ImageUsedType,
   })
-  type: UsedType;
+  type: ImageUsedType;
 }

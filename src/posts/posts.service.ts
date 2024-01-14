@@ -11,7 +11,6 @@ import { CreatePostDto } from './dto/create-post.dto';
 import { updatePostDto } from './dto/update-post.dto';
 import { paginateDto } from './dto/paginate-post.dto';
 import { CommonService } from 'src/common/common.service';
-import { ImageModel } from 'src/common/entities/image.entity';
 
 @Injectable()
 export class PostsService {
@@ -21,16 +20,18 @@ export class PostsService {
     private readonly commonService: CommonService,
   ) {}
 
-  async getPostById(id: number) {
-    const post = await this.postsRepository.findOne({
+  async getPostById(id: number, qr?: QueryRunner) {
+    const repository = this.getRepository(qr);
+    const post = repository.findOne({
       where: {
         id,
       },
       relations: ['author', 'images'],
     });
     if (!post) {
-      throw new NotFoundException();
+      throw new NotFoundException('post를 찾을 수가 없습니다');
     }
+    console.log('repo');
     return post;
   }
   getRepository(qr?: QueryRunner) {
