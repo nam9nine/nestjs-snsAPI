@@ -15,15 +15,13 @@ import { PostsService } from './posts.service';
 import { PostsModel } from './posts.entity';
 import { updatePostDto } from './dto/update-post.dto';
 import { paginateDto } from './dto/paginate-post.dto';
-import { ImageService } from './image/image.service';
-import { DataSource, QueryRunner as QR } from 'typeorm';
 import { LogInterceptor } from 'src/common/intercepter/log.interceptor';
 
 @Controller('posts')
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
   @Get()
-  @UseInterceptors(LogInterceptor)
+  // @UseInterceptors(LogInterceptor)
   async getAllPosts(@Query() query: paginateDto) {
     return this.postsService.getPosts(query);
   }
