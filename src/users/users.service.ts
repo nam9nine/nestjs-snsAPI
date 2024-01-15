@@ -45,11 +45,12 @@ export class UsersService {
     const user = await this.UserRepository.find({
       relations: {
         posts: true,
+        chats: true,
       },
     });
 
     if (!user) {
-      throw new NotFoundException();
+      throw new NotFoundException('유저가 없습니다');
     }
     return user;
   }
@@ -59,7 +60,14 @@ export class UsersService {
         email,
       },
     });
-
     return existingUser;
+  }
+  async getUserById(id: number) {
+    const user = await this.UserRepository.findOne({
+      where: {
+        id,
+      },
+    });
+    return user;
   }
 }

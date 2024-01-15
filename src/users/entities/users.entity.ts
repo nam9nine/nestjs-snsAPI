@@ -1,10 +1,19 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinTable,
+  ManyToMany,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { RolesEnum } from '../const/enum.const';
 import { PostsModel } from 'src/posts/posts.entity';
 import { BaseModel } from 'src/common/entities/base.entitiy';
 import { IsEmail, Length } from 'class-validator';
 import { lengthValidationFunc } from 'src/common/validation-message/length-validation.message';
 import { Exclude } from 'class-transformer';
+import { ChatsModel } from 'src/chats/entities/chats.entity';
+import { MessagesModel } from 'src/chats/messages/entities/message.entity';
 
 @Entity()
 export class UsersModel extends BaseModel {
@@ -40,4 +49,11 @@ export class UsersModel extends BaseModel {
 
   @OneToMany(() => PostsModel, (posts) => posts.author)
   posts: PostsModel[];
+
+  @ManyToMany(() => ChatsModel, (chats) => chats.users)
+  @JoinTable()
+  chats: ChatsModel[];
+
+  @OneToMany(() => MessagesModel, (messages) => messages.user)
+  messages: MessagesModel[];
 }

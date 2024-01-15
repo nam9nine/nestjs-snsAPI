@@ -24,6 +24,9 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { PUBLIC_FOLDER_NAME } from './common/const/path.const';
 import { ImageModel } from './common/entities/image.entity';
 import { APP_INTERCEPTOR } from '@nestjs/core';
+import { ChatsModule } from './chats/chats.module';
+import { ChatsModel } from './chats/entities/chats.entity';
+import { MessagesModel } from './chats/messages/entities/message.entity';
 
 @Module({
   imports: [
@@ -42,13 +45,14 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
       username: process.env[ENV_DB_USERNAME_KEY],
       password: process.env[ENV_DB_PASSWORD_KEY],
       database: process.env[ENV_DB_DATABASE_KEY],
-      entities: [PostsModel, UsersModel, ImageModel],
+      entities: [PostsModel, UsersModel, ImageModel, ChatsModel, MessagesModel],
       synchronize: true,
     }),
     ServeStaticModule.forRoot({
       rootPath: PUBLIC_FOLDER_NAME,
       serveRoot: '/public',
     }),
+    ChatsModule,
   ],
   controllers: [AppController],
   providers: [
