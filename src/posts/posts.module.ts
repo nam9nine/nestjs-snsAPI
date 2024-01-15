@@ -1,4 +1,10 @@
-import { Module, ValidationPipe } from '@nestjs/common';
+import {
+  MiddlewareConsumer,
+  Module,
+  RequestMethod,
+  Type,
+  ValidationPipe,
+} from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { PostsController } from './posts.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -8,6 +14,8 @@ import { UsersModule } from 'src/users/users.module';
 import { CommonModule } from 'src/common/common.module';
 import { ImageModel } from 'src/common/entities/image.entity';
 import { ImageService } from './image/image.service';
+import { MiddlewareConfigProxy, NestModule } from '@nestjs/common/interfaces';
+import { LogMidddleware } from 'src/common/intercepter/middleware/log.middleware';
 
 const validationPipe = new ValidationPipe({
   transform: true,
@@ -27,4 +35,11 @@ const validationPipe = new ValidationPipe({
   controllers: [PostsController],
   providers: [PostsService, ImageService],
 })
-export class PostsModule {}
+export class PostsModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LogMidddleware).forRoutes({
+      path: 'posts',
+      method: RequestMethod.GET,
+    });
+  }
+}
