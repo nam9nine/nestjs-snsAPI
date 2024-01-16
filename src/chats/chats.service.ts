@@ -5,9 +5,7 @@ import { ChatsModel } from './entities/chats.entity';
 import { CreateChatDto } from './dto/create-chat.dto';
 import { CommonService } from 'src/common/common.service';
 import { ChatPaginateDto } from './dto/chats-paginate.dto';
-import { UsersModel } from 'src/users/entities/users.entity';
 import { UsersService } from 'src/users/users.service';
-import { EnterChatDto } from './dto/enter-chat.dto';
 
 @Injectable()
 export class ChatsService {
@@ -23,8 +21,6 @@ export class ChatsService {
     });
   }
   async createChat(chatDto: CreateChatDto) {
-    //한 채팅방에 여러 유저들어감
-
     if (!chatDto.usersId) {
       throw new BadRequestException('chat 없음');
     }

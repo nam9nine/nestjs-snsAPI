@@ -4,6 +4,9 @@ import { AccessTokenGuard } from 'src/auth/guard/bearer-token-guard';
 import { CommonService } from 'src/common/common.service';
 import { User } from 'src/users/decorator/user.decorator';
 import { paginateDto } from 'src/posts/dto/paginate-post.dto';
+import { MessagesService } from './messages/messages.service';
+import { SendMessageDto } from './messages/dto/create-message.dto';
+import { MessagePaginate } from './messages/dto/message-paginate.dto';
 
 @Controller('chats')
 export class ChatsController {

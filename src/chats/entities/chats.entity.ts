@@ -8,6 +8,6 @@ export class ChatsModel extends BaseModel {
   @ManyToMany(() => UsersModel, (users) => users.chats)
   users: UsersModel[];
 
-  @OneToMany(() => MessagesModel, (messages) => messages.chats)
+  @OneToMany(() => MessagesModel, (messages) => messages.chat)
   messages: MessagesModel[];
 }

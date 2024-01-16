@@ -11,7 +11,7 @@ export class MessagesModel extends BaseModel {
   user: UsersModel;
 
   @ManyToOne(() => ChatsModel, (chats) => chats.messages)
-  chats: ChatsModel[];
+  chat: ChatsModel;
 
   @IsString()
   @Column()
