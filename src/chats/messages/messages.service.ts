@@ -17,11 +17,11 @@ export class MessagesService {
 
   getAllMessages() {}
   // message : string , chatId : nubmer
-  async createMessage(dto: SendMessageDto) {
+  async createMessage(dto: SendMessageDto, authorId: number) {
     const message = await this.messagesRepository.save({
       ...dto,
       user: {
-        id: dto.authorId,
+        id: authorId,
       },
       chat: {
         id: dto.chatId,

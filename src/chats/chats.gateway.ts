@@ -14,6 +14,14 @@ import { EnterChatDto } from './dto/enter-chat.dto';
 import { SendMessageDto } from './messages/dto/create-message.dto';
 import { UsersModel } from 'src/users/entities/users.entity';
 import { MessagesService } from './messages/messages.service';
+import {
+  UseFilters,
+  UseGuards,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
+import { SocketCatchHttpExceptionFilter } from 'src/common/exception-filter/socket-catch-http.execption-filter';
+import { SocketBearerTokenGuard } from 'src/auth/guard/socket/socket.bearer-token.guard';
 
 @WebSocketGateway({
   namespace: 'chats',
@@ -29,6 +37,18 @@ export class ChatsGateway implements OnGatewayConnection {
   handleConnection(sockect: Socket) {
     console.log(sockect.id);
   }
+  @UsePipes(
+    new ValidationPipe({
+      transform: true,
+      transformOptions: {
+        enableImplicitConversion: true,
+      },
+      whitelist: true,
+      forbidNonWhitelisted: true,
+    }),
+  )
+  @UseFilters(SocketCatchHttpExceptionFilter)
+  @UseGuards(SocketBearerTokenGuard)
   @SubscribeMessage('create_chat')
   async createChat(
     @MessageBody() usersId: CreateChatDto,
@@ -36,6 +56,17 @@ export class ChatsGateway implements OnGatewayConnection {
   ) {
     const chat = await this.chatsService.createChat(usersId);
   }
+  @UsePipes(
+    new ValidationPipe({
+      transform: true,
+      transformOptions: {
+        enableImplicitConversion: true,
+      },
+      whitelist: true,
+      forbidNonWhitelisted: true,
+    }),
+  )
+  @UseFilters(SocketCatchHttpExceptionFilter)
   @SubscribeMessage('enter_chat')
   async enterChat(
     @MessageBody() dto: EnterChatDto,
@@ -53,7 +84,17 @@ export class ChatsGateway implements OnGatewayConnection {
 
     socket.join(dto.chatsId.map((id) => id.toString()));
   }
-
+  @UsePipes(
+    new ValidationPipe({
+      transform: true,
+      transformOptions: {
+        enableImplicitConversion: true,
+      },
+      whitelist: true,
+      forbidNonWhitelisted: true,
+    }),
+  )
+  @UseFilters(SocketCatchHttpExceptionFilter)
   @SubscribeMessage('send_message')
   async handleEvent(
     @MessageBody() dto: SendMessageDto,
@@ -65,7 +106,10 @@ export class ChatsGateway implements OnGatewayConnection {
         `해당 chat방이 존재하지 않습니다 chatId : ${dto.chatId}`,
       );
     }
-    const message = await this.messagesService.createMessage(dto);
+    const message = await this.messagesService.createMessage(
+      dto,
+      socket.user.id,
+    );
     socket
       .to(message.chat.id.toString())
       .emit('receive_message', message.message);
