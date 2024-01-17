@@ -1,12 +1,8 @@
-import { Body, Controller, Get, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Query, UseGuards } from '@nestjs/common';
 import { ChatsService } from './chats.service';
 import { AccessTokenGuard } from 'src/auth/guard/bearer-token-guard';
-import { CommonService } from 'src/common/common.service';
 import { User } from 'src/users/decorator/user.decorator';
 import { paginateDto } from 'src/posts/dto/paginate-post.dto';
-import { MessagesService } from './messages/messages.service';
-import { SendMessageDto } from './messages/dto/create-message.dto';
-import { MessagePaginate } from './messages/dto/message-paginate.dto';
 
 @Controller('chats')
 export class ChatsController {
@@ -17,7 +13,7 @@ export class ChatsController {
   }
   @Get('myChats')
   @UseGuards(AccessTokenGuard)
-  getMyChats(@User('id') id: number, @Body() dto: paginateDto) {
+  getMyChats(@User('id') id: number, @Query() dto: paginateDto) {
     return this.chatsService.getMyChats(dto, id);
   }
 }

@@ -17,7 +17,6 @@ import { PostsService } from './posts.service';
 import { PostsModel } from './posts.entity';
 import { updatePostDto } from './dto/update-post.dto';
 import { paginateDto } from './dto/paginate-post.dto';
-import { LogInterceptor } from 'src/common/intercepter/log.interceptor';
 import { HttpExceptionFilter } from 'src/common/exception-filter/http.exception-filter';
 import { AccessTokenGuard } from 'src/auth/guard/bearer-token-guard';
 import { CreatePostDto } from './dto/create-post.dto';

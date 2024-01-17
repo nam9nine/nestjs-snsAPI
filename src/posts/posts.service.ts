@@ -26,7 +26,7 @@ export class PostsService {
       where: {
         id,
       },
-      relations: ['author', 'images'],
+      relations: ['author', 'images', 'comments'],
     });
     if (!post) {
       throw new NotFoundException('post를 찾을 수가 없습니다');
@@ -93,7 +93,7 @@ export class PostsService {
       dto,
       this.postsRepository,
       'posts',
-      { relations: ['images', 'author'] },
+      { relations: ['images', 'author', 'comments'] },
     );
   }
 }

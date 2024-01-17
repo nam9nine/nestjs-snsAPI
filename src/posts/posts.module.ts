@@ -1,6 +1,7 @@
 import {
   MiddlewareConsumer,
   Module,
+  NestModule,
   RequestMethod,
   Type,
   ValidationPipe,
@@ -14,8 +15,10 @@ import { UsersModule } from 'src/users/users.module';
 import { CommonModule } from 'src/common/common.module';
 import { ImageModel } from 'src/common/entities/image.entity';
 import { ImageService } from './image/image.service';
-import { MiddlewareConfigProxy, NestModule } from '@nestjs/common/interfaces';
 import { LogMidddleware } from 'src/common/intercepter/middleware/log.middleware';
+import { CommentModel } from './comments/entities/comment.entity';
+import { CommentsController } from './comments/comments.controller';
+import { CommentsModule } from './comments/comments.module';
 
 const validationPipe = new ValidationPipe({
   transform: true,
@@ -27,11 +30,13 @@ const validationPipe = new ValidationPipe({
 });
 @Module({
   imports: [
-    TypeOrmModule.forFeature([PostsModel, ImageModel]),
+    TypeOrmModule.forFeature([PostsModel, ImageModel, CommentModel]),
     UsersModule,
     AuthModule,
     CommonModule,
+    CommentsModule,
   ],
+  exports: [PostsService],
   controllers: [PostsController],
   providers: [PostsService, ImageService],
 })

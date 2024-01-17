@@ -3,6 +3,7 @@ import { BaseModel } from 'src/common/entities/base.entitiy';
 import { ImageModel } from 'src/common/entities/image.entity';
 import { UsersModel } from 'src/users/entities/users.entity';
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
+import { CommentModel } from './comments/entities/comment.entity';
 
 @Entity()
 export class PostsModel extends BaseModel {
@@ -26,4 +27,9 @@ export class PostsModel extends BaseModel {
 
   @OneToMany(() => ImageModel, (images) => images.post)
   images?: ImageModel[];
+
+  @OneToMany(() => CommentModel, (comments) => comments.post, {
+    onDelete: 'CASCADE',
+  })
+  comments: CommentModel[];
 }

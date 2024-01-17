@@ -1,5 +1,7 @@
-import { Controller, Get, Post } from '@nestjs/common';
+import { Controller, Delete, Get, Post, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
+import { AccessTokenGuard } from 'src/auth/guard/bearer-token-guard';
+import { User } from './decorator/user.decorator';
 
 @Controller('users')
 export class UsersController {
@@ -17,4 +19,11 @@ export class UsersController {
   getUsers() {
     return this.usersService.getUsers();
   }
+  @Delete()
+  @UseGuards(AccessTokenGuard)
+  deleteUser(@User('id') id: number) {
+    return this.usersService.deleteUser(id);
+  }
 }
+
+//comment delete는

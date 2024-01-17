@@ -46,6 +46,9 @@ export class UsersService {
       relations: {
         posts: true,
         chats: true,
+        comments: {
+          user: true,
+        },
       },
     });
 
@@ -69,5 +72,9 @@ export class UsersService {
       },
     });
     return user;
+  }
+  async deleteUser(id: number) {
+    await this.UserRepository.delete(id);
+    return true;
   }
 }

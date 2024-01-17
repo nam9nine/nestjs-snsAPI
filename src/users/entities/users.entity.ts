@@ -1,11 +1,4 @@
-import {
-  Column,
-  Entity,
-  JoinTable,
-  ManyToMany,
-  OneToMany,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, JoinTable, ManyToMany, OneToMany } from 'typeorm';
 import { RolesEnum } from '../const/enum.const';
 import { PostsModel } from 'src/posts/posts.entity';
 import { BaseModel } from 'src/common/entities/base.entitiy';
@@ -14,6 +7,7 @@ import { lengthValidationFunc } from 'src/common/validation-message/length-valid
 import { Exclude } from 'class-transformer';
 import { ChatsModel } from 'src/chats/entities/chats.entity';
 import { MessagesModel } from 'src/chats/messages/entities/message.entity';
+import { CommentModel } from 'src/posts/comments/entities/comment.entity';
 
 @Entity()
 export class UsersModel extends BaseModel {
@@ -47,13 +41,18 @@ export class UsersModel extends BaseModel {
   })
   role: RolesEnum;
 
-  @OneToMany(() => PostsModel, (posts) => posts.author)
+  @OneToMany(() => PostsModel, (posts) => posts.author, {
+    onDelete: 'CASCADE',
+  })
   posts: PostsModel[];
 
   @ManyToMany(() => ChatsModel, (chats) => chats.users)
   @JoinTable()
   chats: ChatsModel[];
 
-  @OneToMany(() => MessagesModel, (messages) => messages.user)
+  @OneToMany(() => MessagesModel, (messages) => messages.user, {})
   messages: MessagesModel[];
+
+  @OneToMany(() => CommentModel, (comments) => comments.user, {})
+  comments: CommentModel[];
 }

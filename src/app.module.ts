@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  ClassSerializerInterceptor,
-  Module,
-} from '@nestjs/common';
+import { ClassSerializerInterceptor, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PostsModule } from './posts/posts.module';
@@ -27,6 +23,8 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
 import { ChatsModule } from './chats/chats.module';
 import { ChatsModel } from './chats/entities/chats.entity';
 import { MessagesModel } from './chats/messages/entities/message.entity';
+import { CommentsModule } from './posts/comments/comments.module';
+import { CommentModel } from './posts/comments/entities/comment.entity';
 
 @Module({
   imports: [
@@ -45,7 +43,14 @@ import { MessagesModel } from './chats/messages/entities/message.entity';
       username: process.env[ENV_DB_USERNAME_KEY],
       password: process.env[ENV_DB_PASSWORD_KEY],
       database: process.env[ENV_DB_DATABASE_KEY],
-      entities: [PostsModel, UsersModel, ImageModel, ChatsModel, MessagesModel],
+      entities: [
+        PostsModel,
+        UsersModel,
+        ImageModel,
+        ChatsModel,
+        MessagesModel,
+        CommentModel,
+      ],
       synchronize: true,
     }),
     ServeStaticModule.forRoot({
@@ -53,6 +58,7 @@ import { MessagesModel } from './chats/messages/entities/message.entity';
       serveRoot: '/public',
     }),
     ChatsModule,
+    CommentsModule,
   ],
   controllers: [AppController],
   providers: [
