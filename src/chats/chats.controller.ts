@@ -12,7 +12,6 @@ export class ChatsController {
     return this.chatsService.getChats();
   }
   @Get('myChats')
-  @UseGuards(AccessTokenGuard)
   getMyChats(@User('id') id: number, @Query() dto: paginateDto) {
     return this.chatsService.getMyChats(dto, id);
   }

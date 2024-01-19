@@ -31,7 +31,7 @@ export class PostsService {
     if (!post) {
       throw new NotFoundException('post를 찾을 수가 없습니다');
     }
-    console.log('repo');
+
     return post;
   }
   getRepository(qr?: QueryRunner) {
@@ -86,7 +86,12 @@ export class PostsService {
     if (!post) {
       throw new NotFoundException();
     }
-    this.postsRepository.delete(id);
+    try {
+      this.postsRepository.delete(id);
+      return true;
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
   }
   async getPosts(dto: paginateDto) {
     return this.commonService.paginate<PostsModel>(
@@ -95,5 +100,25 @@ export class PostsService {
       'posts',
       { relations: ['images', 'author', 'comments'] },
     );
+  }
+  async checkPostExistById(id: number) {
+    return this.postsRepository.exist({
+      where: {
+        id,
+      },
+    });
+  }
+  async getMyPostById(userId: number, postId: number) {
+    if (!userId || !postId) {
+      throw new BadRequestException('postId또는 userID가 없습니다');
+    }
+    return this.postsRepository.findOne({
+      where: {
+        id: postId,
+        author: {
+          id: userId,
+        },
+      },
+    });
   }
 }

@@ -20,6 +20,8 @@ import { UseFilters, UsePipes, ValidationPipe } from '@nestjs/common';
 import { SocketCatchHttpExceptionFilter } from 'src/common/exception-filter/socket-catch-http.execption-filter';
 import { AuthService } from 'src/auth/auth.service';
 import { UsersService } from 'src/users/users.service';
+import { IsPublic } from 'src/common/decorator/is-public.decorator';
+import { TokenEnum } from 'src/auth/const/token-enum.const';
 
 @WebSocketGateway({
   namespace: 'chats',
@@ -69,6 +71,7 @@ export class ChatsGateway
   handleDisconnect(socket: Socket) {
     console.log(`disconnect id : ${socket.id}`);
   }
+  // @IsPublic(TokenEnum.ACCESS)
   @UseFilters(SocketCatchHttpExceptionFilter)
   @SubscribeMessage('create_chat')
   async createChat(

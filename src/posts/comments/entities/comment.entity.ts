@@ -16,10 +16,14 @@ export class CommentModel extends BaseModel {
     default: 0,
   })
   likeCount: number;
-  //user
-  @ManyToOne(() => UsersModel, (user) => user.comments)
+
+  @ManyToOne(() => UsersModel, (user) => user.comments, {
+    onDelete: 'CASCADE',
+  })
   user: UsersModel;
-  //post
-  @ManyToOne(() => PostsModel, (post) => post.comments)
+
+  @ManyToOne(() => PostsModel, (post) => post.comments, {
+    onDelete: 'CASCADE',
+  })
   post: PostsModel;
 }

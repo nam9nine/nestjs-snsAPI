@@ -18,7 +18,6 @@ import { PostsModel } from './posts.entity';
 import { updatePostDto } from './dto/update-post.dto';
 import { paginateDto } from './dto/paginate-post.dto';
 import { HttpExceptionFilter } from 'src/common/exception-filter/http.exception-filter';
-import { AccessTokenGuard } from 'src/auth/guard/bearer-token-guard';
 import { CreatePostDto } from './dto/create-post.dto';
 import { User } from 'src/users/decorator/user.decorator';
 import { TransactionInterceptor } from 'src/common/intercepter/transaction.interceptor';
@@ -26,6 +25,11 @@ import { QueryRunner } from 'src/common/decorator/transaction.decorator';
 import { QueryRunner as QR } from 'typeorm';
 import { ImageService } from './image/image.service';
 import { ImageUsedType } from 'src/common/entities/image.entity';
+import { Role } from 'src/users/const/role-metadata.const';
+import { RolesEnum } from 'src/users/const/enum.const';
+import { IsPublic } from 'src/common/decorator/is-public.decorator';
+import { TokenEnum } from 'src/auth/const/token-enum.const';
+import { IsPostMineOrAdminGuard } from './guards/is-post-mine-or-admin.guard';
 
 @Controller('posts')
 export class PostsController {
@@ -34,6 +38,7 @@ export class PostsController {
     private readonly imageService: ImageService,
   ) {}
   @Get()
+  @IsPublic(TokenEnum.ACCESS)
   @UseFilters(HttpExceptionFilter)
   // @UseInterceptors(LogInterceptor)
   async getAllPosts(@Query() query: paginateDto) {
@@ -41,7 +46,6 @@ export class PostsController {
   }
 
   @Post()
-  @UseGuards(AccessTokenGuard)
   @UseInterceptors(TransactionInterceptor)
   async createPost(
     @Body() body: CreatePostDto,
@@ -65,11 +69,13 @@ export class PostsController {
   }
 
   @Get(':id')
+  @IsPublic(TokenEnum.ACCESS)
   async getPost(@Param('id', ParseIntPipe) id: number): Promise<PostsModel> {
     return this.postsService.getPostById(id);
   }
 
   @Patch(':id')
+  @UseGuards(IsPostMineOrAdminGuard)
   patchPost(
     @Param('id', ParseIntPipe) id: number,
     @Body() body: updatePostDto,
@@ -78,6 +84,7 @@ export class PostsController {
   }
 
   @Delete(':id')
+  @Role(RolesEnum.ADMIN)
   deletePost(@Param('id', ParseIntPipe) id: number) {
     return this.postsService.deletePost(id);
   }

@@ -1,4 +1,9 @@
-import { Module, forwardRef } from '@nestjs/common';
+import {
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  forwardRef,
+} from '@nestjs/common';
 import { CommentsService } from './comments.service';
 import { CommentsController } from './comments.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -8,6 +13,7 @@ import { AuthModule } from 'src/auth/auth.module';
 import { PostsModule } from '../posts.module';
 import { PostsService } from '../posts.service';
 import { CommonModule } from 'src/common/common.module';
+import { ExistPostIdMiddleware } from './middleware/exist-post.middleware';
 
 @Module({
   imports: [
@@ -21,4 +27,8 @@ import { CommonModule } from 'src/common/common.module';
   controllers: [CommentsController],
   providers: [CommentsService],
 })
-export class CommentsModule {}
+export class CommentsModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(ExistPostIdMiddleware).forRoutes(CommentsController);
+  }
+}

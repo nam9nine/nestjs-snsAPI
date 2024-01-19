@@ -45,7 +45,7 @@ export class AuthService {
       });
       return payload;
     } catch (e) {
-      throw new UnauthorizedException('토큰이 만료되었습니다');
+      throw new UnauthorizedException(e.message);
     }
   }
   //login 할 때 필요한 함수
@@ -83,7 +83,6 @@ export class AuthService {
     return this.loginUser(createUser);
   }
   extractTokenFromHeader(header: string, isBasicToken: boolean) {
-    // asl;dkfjsaasd <- basic token
     const splitToken = header.split(' ');
     const prefix = isBasicToken ? 'Basic' : 'Bearer';
 
@@ -107,19 +106,25 @@ export class AuthService {
     return object;
   }
   rotateToken(token: string, isRefreshToken: boolean) {
-    const decode = this.JwtService.verify(token, {
-      secret: this.ConfigService.get<string>(ENV_JWT_SECRET_KEY),
-    }); //payload
-
-    if (decode.type !== 'refresh') {
-      throw new UnauthorizedException('토큰 재발급은 refresh토큰만 가능합니다');
+    try {
+      const decode = this.JwtService.verify(token, {
+        secret: this.ConfigService.get<string>(ENV_JWT_SECRET_KEY),
+      });
+      if (decode.type !== 'refresh') {
+        throw new UnauthorizedException(
+          '토큰 재발급은 refresh토큰만 가능합니다',
+        );
+      }
+      return this.signToken(
+        {
+          ...decode,
+        },
+        isRefreshToken,
+      );
+    } catch (e) {
+      throw new UnauthorizedException(
+        'jwt토큰 형식이 이상합니다 제대로된 토큰을 주세요',
+      );
     }
-
-    return this.signToken(
-      {
-        ...decode,
-      },
-      isRefreshToken,
-    );
   }
 }

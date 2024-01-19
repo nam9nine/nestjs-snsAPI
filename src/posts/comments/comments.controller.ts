@@ -12,10 +12,12 @@ import {
 } from '@nestjs/common';
 import { CommentsService } from './comments.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
-import { AccessTokenGuard } from 'src/auth/guard/bearer-token-guard';
 import { User } from 'src/users/decorator/user.decorator';
-import { PostsService } from '../posts.service';
 import { CommentPaginateDto } from './dto/comment-paginate.dto';
+import { updateCommentDto } from './dto/update-comment.dto';
+import { IsPublic } from 'src/common/decorator/is-public.decorator';
+import { TokenEnum } from 'src/auth/const/token-enum.const';
+import { IsCommentMineOrAdminGuard } from './guards/is-comment-mine-or-admin.guard';
 
 @Controller('posts/:postId/comment')
 export class CommentsController {
@@ -26,22 +28,20 @@ export class CommentsController {
   //   return this.commentsService.getMyComments(postId);
   // }
   @Get()
+  @IsPublic(TokenEnum.ACCESS)
   getComments(
     @Param('postId', ParseIntPipe) postId: number,
     @Query() dto: CommentPaginateDto,
   ) {
     return this.commentsService.commentPaginate(dto, postId);
   }
-  @Get(':commentId')
-  async getCommentById(
-    @Param('commentId', ParseIntPipe) commentId: number,
-    @Param('postId', ParseIntPipe) postId: number,
-  ) {
-    return await this.commentsService.getCommentById(postId, commentId);
-  }
+  // @Get(':commentId')
+  // @IsPublic(TokenEnum.ACCESS)
+  // async getCommentById(@Param('commentId', ParseIntPipe) commentId: number) {
+  //   return await this.commentsService.getCommentById(commentId);
+  // }
   @Post()
-  @UseGuards(AccessTokenGuard)
-  async myComments(
+  async postComment(
     @Param('postId', ParseIntPipe) postId: number,
     @Body() dto: CreateCommentDto,
     @User('id') userId: number,
@@ -54,22 +54,18 @@ export class CommentsController {
     return comment;
   }
 
-  @UseGuards(AccessTokenGuard)
   @Patch(':commentId')
+  @UseGuards(IsCommentMineOrAdminGuard)
   patchComment(
-    @Body() newComment: string,
-    @Param('postId', ParseIntPipe) postId: number,
+    @Body() dto: updateCommentDto,
     @Param('commentId', ParseIntPipe) commentId: number,
   ) {
-    return this.commentsService.patchComment(postId, commentId, newComment);
+    return this.commentsService.patchComment(commentId, dto);
   }
 
   @Delete(':commentId')
-  @UseGuards(AccessTokenGuard)
+  @UseGuards(IsCommentMineOrAdminGuard)
   deleteComment(@Param('commentId', ParseIntPipe) id: number) {
     return this.commentsService.deleteComment(id);
   }
-
-  // @Patch()
-  // updateComent() {}
 }

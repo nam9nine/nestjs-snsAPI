@@ -6,6 +6,8 @@ import { CreateCommentDto } from './dto/create-comment.dto';
 import { PostsService } from '../posts.service';
 import { CommentPaginateDto } from './dto/comment-paginate.dto';
 import { CommonService } from 'src/common/common.service';
+import { updatePostDto } from '../dto/update-post.dto';
+import { updateCommentDto } from './dto/update-comment.dto';
 
 @Injectable()
 export class CommentsService {
@@ -16,22 +18,22 @@ export class CommentsService {
     private readonly commonService: CommonService,
   ) {}
 
-  getMyComments(postId: number) {
-    return this.commentsRepository.find({
+  async getMyComment(userId: number, postId: number, commentId: number) {
+    const existComment = await this.commentsRepository.findOne({
       where: {
-        id: postId,
+        user: {
+          id: userId,
+        },
+        post: {
+          id: postId,
+        },
+        id: commentId,
       },
-      relations: ['user', 'post'],
     });
+    return existComment;
   }
   async createComment(dto: CreateCommentDto, userId: number, postId: number) {
     const post = await this.postsService.getPostById(postId);
-
-    // if (!post) {
-    //   throw new BadRequestException(
-    //     `해당 포스터는 없습니다 postID : ${postId}`,
-    //   );
-    // }
 
     const comment = await this.commentsRepository.save({
       ...dto,
@@ -45,8 +47,7 @@ export class CommentsService {
     });
     return comment;
   }
-  async getCommentById(postId: number, commentId: number) {
-    const post = await this.postsService.getPostById(postId);
+  async getCommentById(commentId: number) {
     const comment = await this.commentsRepository.findOne({
       where: {
         id: commentId,
@@ -69,11 +70,17 @@ export class CommentsService {
           },
         },
         relations: ['post', 'user'],
+        select: {
+          user: {
+            nickname: true,
+            id: true,
+          },
+        },
       },
     );
   }
 
-  async patchComment(postId: number, commentId: number, newComment: string) {
+  async patchComment(commentId: number, dto: updateCommentDto) {
     const oldComment = await this.commentsRepository.findOne({
       where: {
         id: commentId,
@@ -84,12 +91,20 @@ export class CommentsService {
     }
     const preComment = await this.commentsRepository.preload({
       id: commentId,
-      comment: newComment,
+      comment: dto.comment,
     });
     const comment = await this.commentsRepository.save(preComment);
     return comment;
   }
   async deleteComment(commentId: number) {
+    const oldComment = await this.commentsRepository.findOne({
+      where: {
+        id: commentId,
+      },
+    });
+    if (!oldComment) {
+      throw new BadRequestException('해당 comment가 없습니다');
+    }
     await this.commentsRepository.delete(commentId);
     return true;
   }

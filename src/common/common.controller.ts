@@ -14,7 +14,6 @@ export class CommonController {
   constructor(private readonly commonService: CommonService) {}
 
   @Get()
-  @UseGuards(AccessTokenGuard)
   @UseInterceptors(FileInterceptor('image'))
   tempPost(@UploadedFile() file: Express.Multer.File) {
     return {
