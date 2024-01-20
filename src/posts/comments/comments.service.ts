@@ -6,7 +6,6 @@ import { CreateCommentDto } from './dto/create-comment.dto';
 import { PostsService } from '../posts.service';
 import { CommentPaginateDto } from './dto/comment-paginate.dto';
 import { CommonService } from 'src/common/common.service';
-import { updatePostDto } from '../dto/update-post.dto';
 import { updateCommentDto } from './dto/update-comment.dto';
 
 @Injectable()
@@ -18,15 +17,13 @@ export class CommentsService {
     private readonly commonService: CommonService,
   ) {}
 
-  async getMyComment(userId: number, postId: number, commentId: number) {
-    const existComment = await this.commentsRepository.findOne({
+  async getMyComment(userId: number, commentId: number) {
+    const existComment = await this.commentsRepository.exist({
       where: {
         user: {
           id: userId,
         },
-        post: {
-          id: postId,
-        },
+
         id: commentId,
       },
     });

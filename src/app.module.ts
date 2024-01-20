@@ -27,6 +27,7 @@ import { CommentsModule } from './posts/comments/comments.module';
 import { CommentModel } from './posts/comments/entities/comment.entity';
 import { RolesGuard } from './users/guard/Role.guard';
 import { AccessTokenGuard } from './auth/guard/bearer-token-guard';
+import { FollowModel } from './users/entities/follow-user.entity';
 
 @Module({
   imports: [
@@ -52,6 +53,7 @@ import { AccessTokenGuard } from './auth/guard/bearer-token-guard';
         ChatsModel,
         MessagesModel,
         CommentModel,
+        FollowModel,
       ],
       synchronize: true,
     }),

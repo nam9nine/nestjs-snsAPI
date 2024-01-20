@@ -109,10 +109,7 @@ export class PostsService {
     });
   }
   async getMyPostById(userId: number, postId: number) {
-    if (!userId || !postId) {
-      throw new BadRequestException('postId또는 userID가 없습니다');
-    }
-    return this.postsRepository.findOne({
+    return this.postsRepository.exist({
       where: {
         id: postId,
         author: {

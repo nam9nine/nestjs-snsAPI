@@ -4,6 +4,7 @@ import {
   ExecutionContext,
   ForbiddenException,
   Injectable,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { Request } from 'express';
 import { PostsService } from 'src/posts/posts.service';
@@ -19,6 +20,9 @@ export class IsPostMineOrAdminGuard implements CanActivate {
       return true;
     }
 
+    if (!user) {
+      throw new UnauthorizedException('해당 유저가 없습니다');
+    }
     const userId = parseInt(user.id);
     const postId = parseInt(user.id);
 
